@@ -1,0 +1,252 @@
+/* ==========================================================================
+   DevSim - Multi-Device Simulator Stylesheet
+   ========================================================================== */
+
+/* ฟอนต์และรูปแบบพื้นฐาน */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0b0f19;
+    color: #e2e8f0;
+}
+
+/* แถบเลื่อน (Custom Scrollbar) สำหรับพื้นที่ Workspace */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #131722;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 5px;
+    border: 2px solid #131722;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* กรอบอุปกรณ์จำลอง (Device Frame) */
+.device-frame {
+    position: relative;
+    background: #000;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-radius 0.4s,
+                border-width 0.4s;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(255, 255, 255, 0.02);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ดีไซน์กรอบแบบ Mobile / Tablet */
+.device-mobile {
+    border: 14px solid #1a1d24;
+    border-radius: 3rem;
+}
+
+.device-mobile iframe {
+    border-radius: 2.2rem;
+}
+
+/* ดีไซน์กรอบแบบ Desktop (มี Title bar จำลองด้านบน) */
+.device-desktop {
+    border: 4px solid #2a2e38;
+    border-top: 24px solid #2a2e38;
+    border-radius: 0.5rem;
+}
+
+.device-desktop iframe {
+    border-radius: 0 0 0.3rem 0.3rem;
+}
+
+/* แอนิเมชันเปิดหน้าจอ (Pop In) */
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ติ่งหน้าจอ / Dynamic Island (Notch) */
+.notch {
+    position: absolute;
+    background: #000;
+    z-index: 50;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notch-portrait {
+    width: 110px;
+    height: 32px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 16px;
+}
+
+.notch-landscape {
+    width: 32px;
+    height: 110px;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 16px;
+}
+
+.notch-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* กรอบ iframe ที่แสดงผลหน้าเว็บ */
+.device-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: #ffffff;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* พื้นที่กระดานจำลอง (Infinite Canvas Workspace) */
+.workspace {
+    position: relative;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    min-width: 3400px;
+    min-height: 2200px;
+    padding: 2rem;
+    zoom: var(--workspace-zoom, 0.75);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+    background-size: 28px 28px;
+    background-color: #0b0f19;
+}
+
+/* หน้าต่างอุปกรณ์จำลองที่ลากย้ายได้อิสระ (Draggable Device View) */
+.device-view {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    user-select: none;
+    transition: box-shadow 0.2s ease;
+}
+
+.device-view.is-dragging {
+    opacity: 0.95;
+    z-index: 9999 !important;
+    filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.8));
+}
+
+.device-view.is-resizing .device-frame {
+    transition: none !important;
+}
+
+/* แถบหัวหน้าต่างสำหรับคลิกลากย้าย (Draggable Window Header) */
+.view-header {
+    cursor: grab;
+    user-select: none;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.view-header:active {
+    cursor: grabbing;
+}
+
+/* มุมสำหรับลากปรับขนาดที่มุมขวาล่าง (Corner Resize Handle) */
+.resize-handle {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 22px;
+    height: 22px;
+    cursor: nwse-resize;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.resize-handle:hover {
+    color: #38bdf8;
+    background: rgba(2, 132, 199, 0.4);
+    border-color: #38bdf8;
+    transform: scale(1.15);
+}
+
+/* ม่านบังเพื่อไม่ให้ iframe แย่ง Pointer Event ขณะคลิกลาก */
+.drag-shield {
+    position: absolute;
+    inset: 0;
+    z-index: 55;
+    display: none;
+    background: transparent;
+}
+
+body.dragging-active .drag-shield {
+    display: block;
+}
+
+/* แผงควบคุมสไตล์ Glassmorphism */
+.glass-panel {
+    background: rgba(18, 22, 31, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* หน้าต่าง Modal */
+.modal-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    transform: scale(0.95);
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+/* วงล้อโหลดข้อมูล (Loading Spinner) */
+.loader {
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}

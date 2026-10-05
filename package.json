@@ -1,0 +1,16 @@
+{
+  "name": "devsim",
+  "version": "1.0.0",
+  "description": "DevSim - Multi-Device Responsive Simulator",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 5500"
+  },
+  "keywords": [
+    "responsive",
+    "simulator",
+    "mobile",
+    "preview"
+  ],
+  "license": "MIT"
+}

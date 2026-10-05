@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSim - Multi-Device Simulator</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden">
+
+    <!-- แถบเมนูด้านบน (Top Navigation Bar) -->
+    <header class="glass-panel p-3 flex flex-col xl:flex-row items-center justify-between gap-4 z-50 shrink-0 shadow-lg">
+        <!-- โลโก้แอปพลิเคชัน -->
+        <div class="flex items-center gap-2 text-blue-500 font-bold text-xl tracking-tight shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M176,16H80A24,24,0,0,0,56,40V216a24,24,0,0,0,24,24h96a24,24,0,0,0,24-24V40A24,24,0,0,0,176,16ZM80,32h96a8,8,0,0,1,8,8v16H72V40A8,8,0,0,1,80,32Zm96,192H80a8,8,0,0,1-8-8V72H184V216A8,8,0,0,1,176,224ZM128,176a12,12,0,1,0,12,12A12,12,0,0,0,128,176Z"></path>
+            </svg>
+            DevSim
+        </div>
+
+        <!-- ช่องกรอก URL ส่วนกลาง และปุ่มดำเนินการ -->
+        <div class="flex flex-col sm:flex-row flex-1 w-full max-w-4xl gap-2 items-center">
+            <div class="flex flex-1 w-full bg-[#0b0e14] p-1.5 rounded-xl border border-gray-700 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all shadow-inner">
+                <div class="flex items-center px-3 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"></path>
+                    </svg>
+                </div>
+                <input 
+                    type="text" 
+                    id="global-url-input"
+                    class="w-full bg-transparent border-none outline-none text-gray-100 placeholder-gray-500 py-1.5 text-sm font-mono"
+                    placeholder="Enter URL (e.g. demo.html, http://localhost:3000)"
+                    value="demo.html"
+                >
+                <div class="flex items-center gap-1.5 shrink-0 pl-2 border-l border-gray-700 ml-1">
+                    <button id="btn-sync-url" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                        Go
+                    </button>
+                    <button id="btn-refresh-all" class="bg-[#1a1d24] hover:bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1.5 rounded-lg transition-all flex items-center shadow-sm group" title="Refresh All Screens">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="group-hover:rotate-180 transition-transform duration-300" viewBox="0 0 256 256">
+                            <path d="M224,128a96,96,0,1,1-21.67-60.69l-14-14a8,8,0,1,1,11.32-11.31l27.31,27.31a8,8,0,0,1,0,11.32L199.66,108a8,8,0,0,1-11.32-11.32l11.45-11.45A80,80,0,1,0,208,128a8,8,0,0,1,16,0Z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Presets -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button id="btn-preset-demo" class="text-xs bg-blue-950/60 border border-blue-500/40 text-blue-300 hover:bg-blue-900 px-3 py-2 rounded-xl transition-colors font-medium flex items-center gap-1">
+                    🌟 <span>เว็บทดสอบ Demo</span>
+                </button>
+                <button id="btn-preset-wiki" class="text-xs bg-[#1a1d24] border border-gray-700 text-gray-300 hover:bg-gray-700 px-3 py-2 rounded-xl transition-colors font-medium flex items-center gap-1">
+                    🌐 <span>Wikipedia</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ปุ่มควบคุมส่วนกลาง (สเกลหน้าจอ / เพิ่มอุปกรณ์ / เพิ่มหน้าจอ) -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0 justify-center">
+            <!-- ปุ่มปรับสเกลขนาดหน้าจอ (Zoom Controls) -->
+            <div class="flex items-center bg-[#13161c] px-2 py-1 rounded-xl border border-gray-700 shadow-sm text-xs">
+                <span class="text-gray-400 pl-1 pr-1.5 text-[11px] font-medium hidden sm:inline">Scale:</span>
+                <button id="btn-zoom-out" class="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors" title="Zoom Out (ย่อขนาด)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"></path></svg>
+                </button>
+                <select id="select-zoom" class="bg-transparent border-none outline-none text-blue-400 text-xs font-semibold px-1 py-0.5 cursor-pointer appearance-none text-center">
+                    <option value="fit" selected>📐 พอดีจอ (Fit All)</option>
+                    <option value="0.4">40%</option>
+                    <option value="0.5">50%</option>
+                    <option value="0.6">60%</option>
+                    <option value="0.7">70%</option>
+                    <option value="0.75">75%</option>
+                    <option value="0.85">85%</option>
+                    <option value="1">100%</option>
+                </select>
+                <button id="btn-zoom-in" class="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors" title="Zoom In (ขยายขนาด)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+                </button>
+                <button id="btn-zoom-fit" class="ml-1 px-2 py-0.5 text-xs font-semibold rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/50 transition-colors flex items-center gap-1" title="คำนวณและปรับสเกลพอดีหน้าจอทั้งหมดอัตโนมัติ">
+                    <span>📐</span>
+                    <span>Fit</span>
+                </button>
+            </div>
+
+            <!-- ปุ่มจัดเรียงตำแหน่งหน้าจออัตโนมัติ -->
+            <button id="btn-align-views" class="bg-[#1a1d24] hover:bg-gray-700 border border-gray-600 text-gray-200 px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 shadow-sm" title="จัดเรียงหน้าจอทุกเครื่องให้เป็นระเบียบเรียงแถวกัน">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM104,72a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8V184a8,8,0,0,1-8,8H112a8,8,0,0,1-8-8Z"></path></svg>
+                <span class="hidden sm:inline">จัดเรียงแถว</span>
+            </button>
+
+            <button id="btn-add-device" class="bg-[#1a1d24] hover:bg-gray-700 border border-gray-600 text-gray-200 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-sm" title="Create a Custom Device Spec">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+                </svg>
+                <span class="hidden md:inline">Custom Device</span>
+            </button>
+            <button id="btn-add-view" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-sm shadow-emerald-900/20" title="Add a new screen view">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+                </svg>
+                Add View
+            </button>
+            <!-- ปุ่มแชร์ให้ผู้อื่นดู (Share Button) -->
+            <button id="btn-share" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 shadow-sm shadow-indigo-900/20" title="แชร์หน้าจอจำลองให้ผู้อื่นดู (Share Workspace)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M192,136a40,40,0,0,0-31.54,15.48l-54.89-31.37a40,40,0,0,0,0-24.22L160.46,64.52A40,40,0,1,0,152,40a39.81,39.81,0,0,0,1.54,10.52L98.65,81.89a40,40,0,1,0,0,44.22l54.89,31.37A39.81,39.81,0,0,0,152,168a40,40,0,1,0,40-32ZM192,24a24,24,0,1,1-24,24A24,24,0,0,1,192,24ZM64,152a24,24,0,1,1,24-24A24,24,0,0,1,64,152ZM192,232a24,24,0,1,1,24-24A24,24,0,0,1,192,232Z"></path>
+                </svg>
+                <span>แชร์</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- พื้นที่ทำงานหลักสำหรับวางหน้าจอจำลอง (Main Workspace) -->
+    <main class="flex-1 overflow-hidden relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800/10 via-[#0b0f19] to-black">
+        <div id="workspace" class="workspace">
+            <!-- หน้าจอจำลองจะถูกแทรกเข้ามาผ่าน script.js -->
+        </div>
+    </main>
+
+    <!-- หน้าต่าง Modal สำหรับสร้าง Custom Device -->
+    <div id="custom-device-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="modal-content bg-[#1a1d24] border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-[#13161c]">
+                <h3 class="text-lg font-semibold text-gray-100 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-emerald-500" viewBox="0 0 256 256">
+                        <path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM128,208a12,12,0,1,1,12-12A12,12,0,0,1,128,208Z"></path>
+                    </svg>
+                    Add Custom Device
+                </h3>
+                <button id="btn-close-modal-x" class="text-gray-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Device Name</label>
+                    <input type="text" id="input-dev-name" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" placeholder="e.g. My Custom Monitor">
+                    <p class="text-xs text-gray-500 mt-1">Tip: Include "iPhone" to enable notch. Width &gt; 1000px acts as Desktop.</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Width (px)</label>
+                        <input type="number" id="input-dev-w" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" placeholder="e.g. 1440" min="100" max="4000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Height (px)</label>
+                        <input type="number" id="input-dev-h" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" placeholder="e.g. 900" min="100" max="4000">
+                    </div>
+                </div>
+                
+                <div id="modal-error" class="text-red-400 text-sm hidden bg-red-900/20 p-3 rounded-lg border border-red-900/50">
+                    Please fill out all fields correctly.
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-gray-700 bg-[#13161c] flex justify-end gap-3">
+                <button id="btn-close-modal" class="px-5 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Cancel</button>
+                <button id="btn-save-device" class="px-5 py-2 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-lg shadow-emerald-900/20">Save Device</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- หน้าต่าง Modal สำหรับแชร์หน้าจอจำลอง (Share Modal) -->
+    <div id="share-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="modal-content bg-[#1a1d24] border border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <!-- Header -->
+            <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-[#13161c]">
+                <h3 class="text-lg font-semibold text-gray-100 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="text-indigo-400" viewBox="0 0 256 256">
+                        <path d="M192,136a40,40,0,0,0-31.54,15.48l-54.89-31.37a40,40,0,0,0,0-24.22L160.46,64.52A40,40,0,1,0,152,40a39.81,39.81,0,0,0,1.54,10.52L98.65,81.89a40,40,0,1,0,0,44.22l54.89,31.37A39.81,39.81,0,0,0,152,168a40,40,0,1,0,40-32ZM192,24a24,24,0,1,1-24,24A24,24,0,0,1,192,24ZM64,152a24,24,0,1,1,24-24A24,24,0,0,1,64,152ZM192,232a24,24,0,1,1,24-24A24,24,0,0,1,192,232Z"></path>
+                    </svg>
+                    แชร์หน้าจอจำลอง (Share DevSim)
+                </h3>
+                <button id="btn-close-share-x" class="text-gray-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+                <!-- Share Options Selector -->
+                <div class="flex items-center gap-2 p-1 bg-[#13161c] rounded-xl border border-gray-700/80 text-xs">
+                    <button id="tab-btn-wifi" class="flex-1 py-2 px-3 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5">
+                        <span>📶</span>
+                        <span>แชร์ในวง Wi-Fi</span>
+                    </button>
+                    <button id="tab-btn-public" class="flex-1 py-2 px-3 rounded-lg font-medium transition-all text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5">
+                        <span>🌐</span>
+                        <span>แชร์ออกเน็ตสาธารณะ</span>
+                    </button>
+                </div>
+
+                <!-- Tab 1: Wi-Fi / Local Network -->
+                <div id="tab-content-wifi" class="space-y-4">
+                    <!-- Option: Include State checkbox -->
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#13161c]/60 border border-gray-800">
+                        <div class="flex flex-col pr-2">
+                            <span class="text-xs font-semibold text-gray-200 flex items-center gap-1.5">
+                                <span>📌</span> แนบสถานะหน้าจอและ URL ปัจจุบัน
+                            </span>
+                            <span class="text-[11px] text-gray-400">ผู้รับจะเห็นหน้าจออุปกรณ์ พิกัด และ URL เหมือนที่คุณกำลังเปิดเป๊ะๆ</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" id="check-include-state" checked class="sr-only peer">
+                            <div class="w-10 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Share URL input + Copy -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1.5">ลิงก์สำหรับส่งให้ผู้อื่น (Wi-Fi เดียวกัน):</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-share-url" readonly class="flex-1 bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono select-all focus:outline-none focus:border-indigo-500">
+                            <button id="btn-copy-share-url" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all flex items-center gap-1.5 shadow-sm shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256">
+                                    <path d="M216,40H88A16,16,0,0,0,72,56V72H56A16,16,0,0,0,40,88V216a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V200h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM184,216H56V88H184V216Zm32-32H200V88a16,16,0,0,0-16-16H88V56H216V184Z"></path>
+                                </svg>
+                                <span id="copy-btn-text">คัดลอก</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- QR Code Card -->
+                    <div class="flex flex-col sm:flex-row items-center gap-4 bg-[#13161c] p-4 rounded-xl border border-gray-700/60">
+                        <div class="w-32 h-32 bg-white rounded-lg p-1.5 flex items-center justify-center shrink-0 shadow-md">
+                            <img id="share-qr-code" src="" alt="QR Code" class="w-full h-full object-contain">
+                        </div>
+                        <div class="space-y-1.5 text-center sm:text-left">
+                            <div class="text-sm font-semibold text-gray-200 flex items-center justify-center sm:justify-start gap-1">
+                                <span>📱</span> สแกนด้วยกล้องมือถือ
+                            </div>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                มือถือ แท็บเล็ต หรือคอมฯ ในวง Wi-Fi เดียวกัน สามารถเปิดกล้องสแกน QR Code นี้เพื่อเปิดหน้าจอจำลองได้ทันที
+                            </p>
+                            <p class="text-[11px] text-gray-500 font-mono mt-1">
+                                IP ในเครือข่าย: <span id="current-lan-ip" class="text-indigo-400 font-semibold">192.168.1.112:5500</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Public Internet Sharing -->
+                <div id="tab-content-public" class="space-y-4 hidden">
+                    <div class="bg-[#13161c] p-4 rounded-xl border border-gray-700/60 space-y-2.5">
+                        <div class="flex items-center gap-2 text-sm font-semibold text-emerald-400">
+                            <span>🚀</span> วิธีที่ 1: เปิด Public Link ผ่านเครื่อง (ฟรี ไม่ต้องลงทะเบียน)
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            ผมได้สร้างไฟล์ <code class="text-indigo-300 bg-gray-800 px-1.5 py-0.5 rounded text-[11px]">share-public.bat</code> ไว้ที่โฟลเดอร์หลักแล้ว เพียงดับเบิลคลิกไฟล์นี้ ระบบจะเปิด Public Tunnel (HTTPS) ให้ทันที ส่งลิงก์ให้ใครในโลกเปิดดูก็ได้!
+                        </p>
+                    </div>
+
+                    <div class="bg-[#13161c] p-4 rounded-xl border border-gray-700/60 space-y-2">
+                        <div class="flex items-center gap-2 text-sm font-semibold text-blue-400">
+                            <span>☁️</span> วิธีที่ 2: นำขึ้น GitHub Pages / Vercel (ฟรีตลอดชีพ 24 ชม.)
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            เนื่องจาก DevSim เป็น HTML + CSS + JS ล้วน (Client-side) สามารถนำโฟลเดอร์ <code class="text-indigo-300 bg-gray-800 px-1.5 py-0.5 rounded text-[11px]">DevSim</code> ขึ้น Vercel หรือ GitHub Pages ได้ฟรีถาวร มีลิงก์สาธารณะใช้งานได้ตลอดเวลา
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="p-4 border-t border-gray-700 bg-[#13161c] flex justify-end">
+                <button id="btn-close-share" class="px-5 py-2 rounded-xl text-xs font-semibold bg-gray-800 hover:bg-gray-700 text-gray-200 transition-colors">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- โหลด JavaScript Logic -->
+    <script src="script.js" defer></script>
+</body>
+</html>
