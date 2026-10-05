@@ -90,6 +90,7 @@ const state = {
     viewCounter: 0,
     zoom: 0.55,        // ระดับสเกลการแสดงผล
     isAutoFit: true,   // โหมดปรับขนาดพอดีจออัตโนมัติ (Smart Fit All)
+    shareMode: 'online', // โหมดการแชร์: 'online' (Vercel ทั่วโลก 24 ชม.) หรือ 'wifi' (Local LAN)
     views: {},         // จัดเก็บสถานะหน้าจอที่เปิดอยู่: { [vid]: { deviceKey, isLandscape } }
     customDevices: {}, // รายการอุปกรณ์ที่ผู้ใช้เพิ่มขึ้นมาเอง
     allDevices: {}     // อุปกรณ์ทั้งหมด (Default + Custom)
@@ -851,25 +852,36 @@ const exportWorkspaceState = () => {
 };
 
 /**
- * สร้างลิงก์สำหรับแชร์ให้ผู้อื่น (รองรับทั้งแบบแชร์ URL ปกติ และแนบสถานะหน้าจอ)
+ * สร้างลิงก์สำหรับแชร์ให้ผู้อื่น (รองรับทั้งแบบแชร์ออนไลน์ผ่าน Vercel และแบบในวง Wi-Fi)
+ * @param {string} mode - โหมดการแชร์ ('online' หรือ 'wifi')
  * @param {boolean} includeState - ต้องการแนบสถานะหน้าจอไปด้วยหรือไม่
  * @returns {string} URL สำหรับแชร์
  */
-const getShareableUrl = (includeState = true) => {
-    let host = window.location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1' || !host) {
-        host = '192.168.1.112'; // IP ประจำเครื่องสำหรับคนในวง Wi-Fi
+const getShareableUrl = (mode = state.shareMode || 'online', includeState = true) => {
+    let baseUrl;
+    const isVercel = window.location.hostname.includes('vercel.app');
+
+    if (mode === 'online') {
+        // หากเปิดอยู่บน Vercel แล้ว ให้ใช้ Origin ปัจจุบัน หากทดสอบในเครื่อง ให้ชี้ไปที่โดเมน Vercel ออนไลน์ทันที
+        baseUrl = isVercel ? (window.location.origin + window.location.pathname) : 'https://devsim-tau.vercel.app/';
+    } else {
+        // โหมด Wi-Fi ในวงเดียวกัน
+        let host = window.location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1' || !host) {
+            host = '192.168.1.112'; // IP ประจำเครื่องสำหรับคนในวง Wi-Fi
+        }
+        const port = window.location.port ? `:${window.location.port}` : '';
+        const protocol = window.location.protocol || 'http:';
+        baseUrl = `${protocol}//${host}${port}${window.location.pathname}`;
     }
-    const port = window.location.port ? `:${window.location.port}` : '';
-    const protocol = window.location.protocol || 'http:';
-    const baseUrl = `${protocol}//${host}${port}${window.location.pathname}`;
 
     if (includeState) {
         const workspaceData = exportWorkspaceState();
         // เข้ารหัส Base64 รองรับภาษาไทยและอักขระพิเศษอย่างปลอดภัย
         const jsonStr = JSON.stringify(workspaceData);
         const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
-        return `${baseUrl}#state=${encoded}`;
+        const separator = baseUrl.includes('#') ? '&' : '#';
+        return `${baseUrl}${separator}state=${encoded}`;
     }
     return baseUrl;
 };
@@ -923,19 +935,37 @@ const updateShareUrlDisplay = () => {
     const checkState = document.getElementById('check-include-state');
     const inputUrl = document.getElementById('input-share-url');
     const qrImg = document.getElementById('share-qr-code');
-    const lanSpan = document.getElementById('current-lan-ip');
+    const domainSpan = document.getElementById('current-share-domain');
+    const shareBanner = document.getElementById('share-banner');
+    const shareUrlLabel = document.getElementById('share-url-label');
 
     const includeState = checkState ? checkState.checked : true;
-    const shareUrl = getShareableUrl(includeState);
+    const currentMode = state.shareMode || 'online';
+    const isOnline = currentMode === 'online';
+    const shareUrl = getShareableUrl(currentMode, includeState);
 
     if (inputUrl) inputUrl.value = shareUrl;
 
-    let host = window.location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1' || !host) {
-        host = '192.168.1.112';
+    if (isOnline) {
+        if (shareUrlLabel) shareUrlLabel.textContent = 'ลิงก์ออนไลน์สำหรับส่งให้ผู้อื่น (เปิดได้ทุกที่ทั่วโลก 24 ชม.):';
+        if (shareBanner) {
+            shareBanner.className = 'bg-indigo-950/40 border border-indigo-500/30 p-2.5 rounded-xl flex items-center gap-2 text-xs text-indigo-200';
+            shareBanner.innerHTML = '<span class="text-base">🚀</span><span><b>ออนไลน์ 24 ชม. ผ่าน Vercel:</b> ส่งให้ใครในโลกเปิดดูก็ได้ทันที ไม่ต้องเปิดคอมหรือไฟล์ใดๆ ในเครื่องทิ้งไว้</span>';
+        }
+        if (domainSpan) domainSpan.textContent = 'devsim-tau.vercel.app';
+    } else {
+        if (shareUrlLabel) shareUrlLabel.textContent = 'ลิงก์สำหรับคนในวง Wi-Fi เดียวกัน:';
+        let host = window.location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1' || !host) {
+            host = '192.168.1.112';
+        }
+        const port = window.location.port ? `:${window.location.port}` : '';
+        if (shareBanner) {
+            shareBanner.className = 'bg-amber-950/40 border border-amber-500/30 p-2.5 rounded-xl flex items-center gap-2 text-xs text-amber-200';
+            shareBanner.innerHTML = '<span class="text-base">📶</span><span><b>แชร์เฉพาะในวง Wi-Fi:</b> เครื่องผู้รับต้องเชื่อมต่อ Wi-Fi เดียวกับคุณจึงจะเข้าดูได้</span>';
+        }
+        if (domainSpan) domainSpan.textContent = `${host}${port}`;
     }
-    const port = window.location.port ? `:${window.location.port}` : '';
-    if (lanSpan) lanSpan.textContent = `${host}${port}`;
 
     if (qrImg) {
         qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`;
@@ -948,6 +978,16 @@ const updateShareUrlDisplay = () => {
 const openShareModal = () => {
     const modal = document.getElementById('share-modal');
     if (!modal) return;
+
+    // รีเซ็ตแท็บเป็นออนไลน์ทุกครั้งที่เปิด
+    state.shareMode = 'online';
+    const tabBtnOnline = document.getElementById('tab-btn-online');
+    const tabBtnWifi = document.getElementById('tab-btn-wifi');
+    if (tabBtnOnline && tabBtnWifi) {
+        tabBtnOnline.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5';
+        tabBtnWifi.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5';
+    }
+
     modal.classList.add('active');
     updateShareUrlDisplay();
 };
@@ -1008,10 +1048,8 @@ const setupEventListeners = () => {
     const shareModal = document.getElementById('share-modal');
     const btnCopyShareUrl = document.getElementById('btn-copy-share-url');
     const checkIncludeState = document.getElementById('check-include-state');
+    const tabBtnOnline = document.getElementById('tab-btn-online');
     const tabBtnWifi = document.getElementById('tab-btn-wifi');
-    const tabBtnPublic = document.getElementById('tab-btn-public');
-    const tabContentWifi = document.getElementById('tab-content-wifi');
-    const tabContentPublic = document.getElementById('tab-content-public');
 
     if (btnShare) btnShare.addEventListener('click', openShareModal);
     if (btnCloseShare) btnCloseShare.addEventListener('click', closeShareModal);
@@ -1072,20 +1110,20 @@ const setupEventListeners = () => {
         });
     }
 
-    // แท็บสลับ Wi-Fi / เน็ตสาธารณะ
-    if (tabBtnWifi && tabBtnPublic && tabContentWifi && tabContentPublic) {
-        tabBtnWifi.addEventListener('click', () => {
-            tabBtnWifi.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5';
-            tabBtnPublic.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5';
-            tabContentWifi.classList.remove('hidden');
-            tabContentPublic.classList.add('hidden');
+    // สลับแท็บโหมดการแชร์ (ออนไลน์ Vercel vs ในวง Wi-Fi)
+    if (tabBtnOnline && tabBtnWifi) {
+        tabBtnOnline.addEventListener('click', () => {
+            state.shareMode = 'online';
+            tabBtnOnline.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5';
+            tabBtnWifi.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5';
+            updateShareUrlDisplay();
         });
 
-        tabBtnPublic.addEventListener('click', () => {
-            tabBtnPublic.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5';
-            tabBtnWifi.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5';
-            tabContentPublic.classList.remove('hidden');
-            tabContentWifi.classList.add('hidden');
+        tabBtnWifi.addEventListener('click', () => {
+            state.shareMode = 'wifi';
+            tabBtnWifi.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5';
+            tabBtnOnline.className = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5';
+            updateShareUrlDisplay();
         });
     }
 
@@ -1171,8 +1209,9 @@ const init = () => {
     let loadedFromShare = false;
     const hash = window.location.hash;
     if (hash && hash.includes('state=')) {
-        const rawState = hash.split('state=')[1];
+        let rawState = hash.split('state=')[1];
         if (rawState) {
+            rawState = rawState.split('&')[0];
             loadedFromShare = importWorkspaceState(rawState);
         }
     }
