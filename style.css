@@ -114,9 +114,15 @@ body {
 /* กรอบ iframe ที่แสดงผลหน้าเว็บ */
 .device-iframe {
     width: 100%;
+    min-width: 100%;
+    max-width: 100%;
     height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    display: block;
     border: none;
-    background-color: #ffffff;
+    background-color: #0f172a; /* ปรับเป็นสีมืดเพื่อป้องกันแถบขาว */
+    -webkit-overflow-scrolling: touch;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -133,6 +139,15 @@ body {
     background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
     background-size: 28px 28px;
     background-color: #0b0f19;
+}
+
+/* ป้องกันบั๊ก WebKit / Safari บน iPad, iPhone และ Mac ที่บีบ Layout Viewport ของ iframe จนเหลือครึ่งจอ */
+@supports (-webkit-touch-callout: none) {
+    .workspace {
+        zoom: 1 !important;
+        transform-origin: 0 0;
+        transform: scale(var(--workspace-zoom, 0.75));
+    }
 }
 
 /* หน้าต่างอุปกรณ์จำลองที่ลากย้ายได้อิสระ (Draggable Device View) */

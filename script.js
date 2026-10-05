@@ -293,7 +293,22 @@ const setZoom = (level, isManual = false) => {
     const workspace = document.getElementById('workspace');
     if (workspace) {
         workspace.style.setProperty('--workspace-zoom', clamped);
-        workspace.style.zoom = clamped;
+
+        // ตรวจจับ Safari / WebKit (ทั้งบน iPad, iPhone และ macOS)
+        const isWebKitSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
+                               /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        if (isWebKitSafari) {
+            // บน Safari: CSS zoom มีบั๊กที่บีบ Layout Viewport ของ iframe จนเกิดแถบขาวครึ่งจอ
+            // จึงใช้ transform: scale() แทน zoom เสมอเพื่อให้ iframe แสดงผลเต็มหน้าจอ 100%
+            workspace.style.zoom = '1';
+            workspace.style.transformOrigin = '0 0';
+            workspace.style.transform = `scale(${clamped})`;
+        } else {
+            workspace.style.zoom = clamped;
+            workspace.style.transform = 'none';
+        }
     }
 
     const selectZoom = document.getElementById('select-zoom');
