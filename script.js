@@ -1007,6 +1007,28 @@ const setupEventListeners = () => {
         });
     }
 
+    // การเปิด/ปิด Modal คู่มือการใช้งาน (User Manual)
+    const btnManual = document.getElementById('btn-manual');
+    const manualModal = document.getElementById('manual-modal');
+    const btnCloseManual = document.getElementById('btn-close-manual');
+    const btnCloseManualX = document.getElementById('btn-close-manual-x');
+
+    const openManualModal = () => {
+        if (manualModal) manualModal.classList.add('active');
+    };
+    const closeManualModal = () => {
+        if (manualModal) manualModal.classList.remove('active');
+    };
+
+    if (btnManual) btnManual.addEventListener('click', openManualModal);
+    if (btnCloseManual) btnCloseManual.addEventListener('click', closeManualModal);
+    if (btnCloseManualX) btnCloseManualX.addEventListener('click', closeManualModal);
+    if (manualModal) {
+        manualModal.addEventListener('click', (e) => {
+            if (e.target === manualModal) closeManualModal();
+        });
+    }
+
     if (checkIncludeState) {
         checkIncludeState.addEventListener('change', updateShareUrlDisplay);
     }

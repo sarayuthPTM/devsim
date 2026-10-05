@@ -116,6 +116,13 @@
                 </svg>
                 <span>แชร์</span>
             </button>
+            <!-- ปุ่มคู่มือการใช้งาน (User Manual Button) -->
+            <button id="btn-manual" class="bg-[#1a1d24] hover:bg-gray-700 border border-gray-600 text-gray-200 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 shadow-sm" title="คู่มือการใช้งาน DevSim (User Manual)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M216,32H72A48.05,48.05,0,0,0,24,80V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V40A8,8,0,0,0,216,32ZM72,48H208V192H72a32,32,0,0,1-32-32V80A32,32,0,0,1,72,48ZM208,208H40V169.41A47.93,47.93,0,0,0,72,176H208Z"></path>
+                </svg>
+                <span class="hidden sm:inline">คู่มือ</span>
+            </button>
         </div>
     </header>
 
@@ -279,6 +286,104 @@
             <!-- Footer -->
             <div class="p-4 border-t border-gray-700 bg-[#13161c] flex justify-end">
                 <button id="btn-close-share" class="px-5 py-2 rounded-xl text-xs font-semibold bg-gray-800 hover:bg-gray-700 text-gray-200 transition-colors">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- หน้าต่าง Modal สำหรับคู่มือการใช้งาน (User Manual Modal) -->
+    <div id="manual-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="modal-content bg-[#1a1d24] border border-gray-700 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[88vh]">
+            <!-- Header -->
+            <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-[#13161c] shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
+                            <path d="M216,32H72A48.05,48.05,0,0,0,24,80V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V40A8,8,0,0,0,216,32ZM72,48H208V192H72a32,32,0,0,1-32-32V80A32,32,0,0,1,72,48ZM208,208H40V169.41A47.93,47.93,0,0,0,72,176H208Z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-100">คู่มือการใช้งาน DevSim</h3>
+                        <p class="text-xs text-gray-400">ระบบจำลองหน้าจอมือถือและอุปกรณ์แบบ Multi-Device Simulator</p>
+                    </div>
+                </div>
+                <button id="btn-close-manual-x" class="text-gray-400 hover:text-white transition-colors p-1 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Body Content -->
+            <div class="p-6 space-y-4 overflow-y-auto flex-1 text-sm text-gray-300">
+                
+                <!-- หมวด 1: การโหลดและทดสอบเว็บ -->
+                <div class="bg-[#13161c] p-4 rounded-xl border border-gray-700/60 space-y-2">
+                    <h4 class="font-semibold text-white flex items-center gap-2 text-sm">
+                        <span class="text-blue-400">🌐</span> 1. การป้อนและทดสอบเว็บไซต์
+                    </h4>
+                    <ul class="text-xs space-y-1.5 text-gray-300 list-disc list-inside">
+                        <li><b>ป้อน URL:</b> พิมพ์ URL ของเว็บที่คุณต้องการทดสอบ (เช่น <code class="text-blue-300 bg-gray-800 px-1 py-0.5 rounded">https://example.com</code> หรือ <code class="text-blue-300 bg-gray-800 px-1 py-0.5 rounded">localhost:3000</code>) ในแถบด้านบน แล้วกดปุ่ม <b>Go</b> หรือกด Enter</li>
+                        <li><b>ปุ่ม 🌟 เว็บทดสอบ Demo:</b> โหลดหน้าเว็บร้านค้าตัวอย่าง (SmartStore) ซึ่งมี <b>ไม้บรรทัดวัดความกว้างหน้าจอเรียลไทม์</b> แสดงขนาดพิกเซลและประเภท Breakpoint บนหน้าจอจริงทันที</li>
+                        <li><b>ปุ่มรีเฟรช (Refresh All):</b> กดปุ่มลูกศรวนเพื่อโหลดหน้าเว็บใหม่พร้อมกันทุกหน้าจอ</li>
+                    </ul>
+                </div>
+
+                <!-- หมวด 2: การจัดการหน้าจออุปกรณ์ -->
+                <div class="bg-[#13161c] p-4 rounded-xl border border-gray-700/60 space-y-2">
+                    <h4 class="font-semibold text-white flex items-center gap-2 text-sm">
+                        <span class="text-emerald-400">📱</span> 2. การควบคุมหน้าจอจำลอง (Device Control)
+                    </h4>
+                    <ul class="text-xs space-y-1.5 text-gray-300 list-disc list-inside">
+                        <li><b>เลือกรุ่นอุปกรณ์:</b> คลิกที่แถบ Dropdown บนหัวแต่ละเครื่อง มีรุ่นให้เลือกครบทั้ง iPhone 17 ทุกรุ่น, iPad, แล็ปท็อป และเดสก์ท็อป</li>
+                        <li><b>เพิ่มหน้าจอ (Add View):</b> คลิกปุ่มสีเขียว <b>Add View</b> เพื่อเปิดหน้าต่างเครื่องใหม่เพิ่มเข้ามา</li>
+                        <li><b>หมุนจอ (Rotate):</b> คลิกปุ่มไอคอนหมุน 🔄 เพื่อสลับระหว่างแนวตั้ง (Portrait) และแนวนอน (Landscape)</li>
+                        <li><b>ปิดหน้าจอ:</b> คลิกปุ่ม ✕ สีแดงเพื่อปิดหน้าต่างนั้นออกไป</li>
+                        <li><b>เพิ่มรุ่นขนาดเอง (Custom Device):</b> คลิกปุ่ม <b>Custom Device</b> เพื่อระบุความกว้าง×ความสูงที่ต้องการ</li>
+                    </ul>
+                </div>
+
+                <!-- หมวด 3: ลากย้ายอิสระ & ปรับขนาดล็อคสัดส่วน -->
+                <div class="bg-[#13161c] p-4 rounded-xl border border-gray-700/60 space-y-2">
+                    <h4 class="font-semibold text-white flex items-center gap-2 text-sm">
+                        <span class="text-amber-400">🖐️</span> 3. การลากย้ายอิสระ & การปรับขนาด
+                    </h4>
+                    <ul class="text-xs space-y-1.5 text-gray-300 list-disc list-inside">
+                        <li><b>ลากย้ายตำแหน่งไปตรงไหนก็ได้:</b> คลิกค้างที่ <b>แถบหัวหน้าต่าง (จุดจับ ⋮⋮)</b> แล้วลากหน้าต่างไปวางตำแหน่งใดก็ได้บนกระดานแคนวาส</li>
+                        <li><b>ลากปรับขนาดที่มุม:</b> เลื่อนเมาส์ไปที่ <b>มุมขวาล่างของเครื่อง (ไอคอน ◢)</b> แล้วคลิกลากเพื่อย่อ-ขยายขนาดพิกเซล</li>
+                        <li><b>🔒 ล็อคสัดส่วนตามรุ่นโทรศัพท์:</b> ระบบจะล็อคอัตราส่วนตามรุ่นจริงไว้เสมอ เพื่อป้องกันภาพยืดบวมผิดรูป</li>
+                        <li><b>ปุ่ม 🔒/🔓:</b> คลิกเพื่อสลับระหว่างโหมดล็อคสัดส่วนตามรุ่น หรือขยายอิสระ</li>
+                        <li><b>ปุ่ม ↩ รีเซ็ตขนาด:</b> กดปุ่มลูกศรย้อนกลับ หรือ <b>ดับเบิลคลิกที่มุมขวาล่าง</b> เพื่อคืนค่าขนาดกลับสู่มาตรฐาน 100% ของรุ่นทันที</li>
+                    </ul>
+                </div>
+
+                <!-- หมวด 4: สเกลหน้าจอและการจัดระเบียบ -->
+                <div class="bg-[#13161c] p-4 rounded-xl border border-gray-700/60 space-y-2">
+                    <h4 class="font-semibold text-white flex items-center gap-2 text-sm">
+                        <span class="text-purple-400">📐</span> 4. ระบบ Zoom & จัดระเบียบหน้าจอ
+                    </h4>
+                    <ul class="text-xs space-y-1.5 text-gray-300 list-disc list-inside">
+                        <li><b>Scale / Zoom:</b> ย่อ-ขยายมุมมองกระดานได้ตั้งแต่ 40% ถึง 100%</li>
+                        <li><b>ปุ่ม 📐 Fit:</b> ระบบจะคำนวณและปรับขนาดอัตโนมัติให้ทุกหน้าจอแสดงผลได้พอดีกับมอนิเตอร์ ไม่ล้นตกขอบล่าง</li>
+                        <li><b>ปุ่มจัดเรียงแถว:</b> หากคุณลากหน้าจอกระจายไว้ สามารถกดปุ่มนี้เพื่อดึงหน้าจอทุกเครื่องกลับมาเรียงแถวกันอย่างเป็นระเบียบในคลิกเดียว</li>
+                    </ul>
+                </div>
+
+                <!-- หมวด 5: การแชร์ -->
+                <div class="bg-[#13161c] p-4 rounded-xl border border-gray-700/60 space-y-2">
+                    <h4 class="font-semibold text-white flex items-center gap-2 text-sm">
+                        <span class="text-indigo-400">🔗</span> 5. การแชร์ให้ผู้อื่นดู (Share System)
+                    </h4>
+                    <ul class="text-xs space-y-1.5 text-gray-300 list-disc list-inside">
+                        <li><b>แชร์ผ่าน Wi-Fi:</b> กดปุ่ม <b>แชร์</b> เพื่อคัดลอกลิงก์ หรือให้เพื่อนใช้กล้องมือถือสแกน <b>QR Code</b> เปิดดูได้ทันที</li>
+                        <li><b>📌 แนบสถานะหน้าจอ:</b> เมื่อเปิดตัวเลือกนี้ ลิงก์ที่แชร์จะบันทึกอุปกรณ์ พิกัด และ URL ปัจจุบันไปด้วย ผู้รับที่เปิดจะได้หน้าจอเหมือนที่คุณจัดไว้เป๊ะๆ</li>
+                    </ul>
+                </div>
+
+            </div>
+            
+            <!-- Footer -->
+            <div class="p-4 border-t border-gray-700 bg-[#13161c] flex justify-end shrink-0">
+                <button id="btn-close-manual" class="px-5 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-sm">เข้าใจแล้ว (ปิดคู่มือ)</button>
             </div>
         </div>
     </div>
